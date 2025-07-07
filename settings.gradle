@@ -1,4 +1,5 @@
 rootProject.name = 'fitory'
 include 'application'
 include 'domain'
+include 'web'
 
