@@ -1,13 +1,13 @@
-package io.github.yountaewoo.fitory;
+package io.github.yountaewoo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FitoryApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FitoryApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
