@@ -1,8 +1,7 @@
 plugins {
     id 'java'
-    // Spring Boot 플러그인은 제거
-    // id 'org.springframework.boot' version '3.5.3'
-    // id 'io.spring.dependency-management' version '1.1.7'
+    // 공통으로 의존성 관리할 플러그인만 선언 (apply false 로 두면 루트에만 적용됨)
+    id 'io.spring.dependency-management' version '1.1.7' apply false
 }
 
 group = 'io.github.yountaewoo'
@@ -33,7 +32,23 @@ configurations {
 repositories {
     mavenCentral()
 }
+// ── 아래를 루트 파일에 추가 ───────────────────────────────────────────────
+// 모든 서브프로젝트에 dependency-management 플러그인과 BOM을 적용합니다.
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
 
+    dependencyManagement {
+        imports {
+            // Spring Boot 전체 의존성 버전 묶음(BOM)
+            mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.3"
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     compileOnly 'org.projectlombok:lombok:1.18.28'
