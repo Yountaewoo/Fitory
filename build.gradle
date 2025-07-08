@@ -14,6 +14,16 @@ java {
     }
 }
 
+subprojects {
+    apply plugin: 'java'                     // 서브모듈에도 java 플러그인 적용
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
