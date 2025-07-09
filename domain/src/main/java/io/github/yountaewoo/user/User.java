@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     private String name;
@@ -24,7 +23,8 @@ public class User {
 
     private Gender gender;
 
-    public User(String name, double height, Gender gender) {
+    public User(String id, String name, double height, Gender gender) {
+        this.id = id;
         this.name = name;
         this.height = height;
         this.gender = gender;
