@@ -26,12 +26,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        command:
-          - "postgres"
-          - "-c"
-          - "max_connections=100"
-          - "-c"
-          - "client_encoding=UTF8"
+        # ▶ command: 블록 제거 (GitHub Actions에서 지원되지 않음)
 
     steps:
       - name: Checkout code
