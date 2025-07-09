@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: Fitory
+          POSTGRES_USER: youn
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          TZ: Asia/Seoul
+        options: >-
+          --health-cmd "pg_isready -U youn -d Fitory"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        command:
+          - "postgres"
+          - "-c"
+          - "max_connections=100"
+          - "-c"
+          - "client_encoding=UTF8"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run tests
+        run: |
+          chmod +x gradlew
+          ./gradlew \
+            -Dspring.datasource.url=jdbc:postgresql://localhost:5432/Fitory \
+            -Dspring.datasource.username=youn \
+            -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
+            test \
+            --no-daemon
