@@ -16,23 +16,17 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String name;
 
     private double height;
 
-    private String loginId;
-
-    private String password;
-
     private Gender gender;
 
-    public User(String name, double height, String loginId, String password, Gender gender) {
+    public User(String name, double height, Gender gender) {
         this.name = name;
         this.height = height;
-        this.loginId = loginId;
-        this.password = password;
         this.gender = gender;
     }
 }
