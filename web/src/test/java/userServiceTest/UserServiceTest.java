@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -68,5 +69,36 @@ class UserServiceTest {
         assertThat(resp.gender()).isEqualTo(req.gender());
         then(userRepository).should().save(any(User.class));
     }
+
+    @Test
+    @DisplayName("존재하는 사용자를 탈퇴 처리하면 withdrawn 플래그가 true가 된다")
+    void givenExistingUser_whenWithdrawMember_thenMarkWithdrawn() {
+        // given
+        String userId = "user3";
+        User existing = new User(userId, "박영수", 180.0, Gender.Man);
+        given(userRepository.findById(userId)).willReturn(Optional.of(existing));
+
+        // when
+        userService.withdrawMember(userId);
+
+        // then
+        assertThat(existing.isWithdrawn()).isTrue();
+        then(userRepository).should().findById(userId);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자를 탈퇴 처리하면 NoSuchElementException 발생")
+    void givenNoUser_whenWithdrawMember_thenThrowException() {
+        // given
+        String userId = "nonexistent";
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> userService.withdrawMember(userId))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당하는 사용자가 없습니다.");
+        then(userRepository).should().findById(userId);
+    }
+
 }
 
