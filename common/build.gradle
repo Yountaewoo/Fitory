@@ -12,6 +12,18 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // Spring MVC (RestController, ResponseEntity 등)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring Security (AccessDeniedException 처리용)
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // (선택) Bean Validation 오류 처리용
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // 로깅
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
 }
 
 test {
