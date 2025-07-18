@@ -23,10 +23,17 @@ public class User {
 
     private Gender gender;
 
+    private boolean withdrawn;
+
     public User(String id, String name, double height, Gender gender) {
         this.id = id;
         this.name = name;
         this.height = height;
         this.gender = gender;
+        this.withdrawn = false;
+    }
+
+    public void withdraw() {
+        this.withdrawn = true;
     }
 }

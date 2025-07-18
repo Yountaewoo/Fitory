@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -25,11 +26,18 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse getOrCreateUser (String userId, UserRequest userRequest) {
+    public UserResponse getOrCreateUser(String userId, UserRequest userRequest) {
         User user = userRepository.findById(userId)
                 .orElseGet(() -> userRepository.save(
                         new User(userId, userRequest.name(), userRequest.height(), userRequest.gender())
                 ));
         return transToUserResponse(user);
+    }
+
+    public void withdrawMember(String userid) {
+        User user = userRepository.findById(userid).orElseThrow(
+                () -> new NoSuchElementException("해당하는 사용자가 없습니다.")
+        );
+        user.withdraw();
     }
 }
