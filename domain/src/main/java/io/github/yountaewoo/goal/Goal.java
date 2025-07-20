@@ -19,7 +19,7 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private String userId;
 
     private double targetBodyFatPercent;
 
@@ -29,7 +29,7 @@ public class Goal {
 
     private LocalDate endDate;
 
-    public Goal(Long userId, double targetBodyFatPercent, double targetMuscleMes, LocalDate startDate, LocalDate endDate) {
+    public Goal(String userId, double targetBodyFatPercent, double targetMuscleMes, LocalDate startDate, LocalDate endDate) {
         this.userId = userId;
         this.targetBodyFatPercent = targetBodyFatPercent;
         this.targetMuscleMes = targetMuscleMes;

@@ -19,13 +19,13 @@ public class WeightLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private String userId;
 
     private double weight;
 
     private LocalDate recordDate;
 
-    public WeightLog(Long userId, double weight, LocalDate recordDate) {
+    public WeightLog(String userId, double weight, LocalDate recordDate) {
         this.userId = userId;
         this.weight = weight;
         this.recordDate = recordDate;

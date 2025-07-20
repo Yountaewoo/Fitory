@@ -18,13 +18,13 @@ public class Routine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private String userId;
 
     private String name;
 
     private DayOfWeek dayOfWeek;
 
-    public Routine(Long userId, String name, DayOfWeek dayOfWeek) {
+    public Routine(String userId, String name, DayOfWeek dayOfWeek) {
         this.userId = userId;
         this.name = name;
         this.dayOfWeek = dayOfWeek;
