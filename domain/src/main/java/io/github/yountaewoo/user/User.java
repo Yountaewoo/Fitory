@@ -19,6 +19,7 @@ public class User {
 
     private double height;
 
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     private boolean withdrawn;
