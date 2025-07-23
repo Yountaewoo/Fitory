@@ -30,4 +30,8 @@ public class WeightLog {
         this.weight = weight;
         this.recordDate = recordDate;
     }
+
+    public void updateWeight(double weight) {
+        this.weight = weight;
+    }
 }

@@ -2,6 +2,7 @@ package io.github.yountaewoo.weightLog;
 
 import io.github.yountaewoo.user.User;
 import io.github.yountaewoo.user.UserRepository;
+import io.github.yountaewoo.weightLog.dto.UpdateWeightRequest;
 import io.github.yountaewoo.weightLog.dto.WeightLogRequest;
 import io.github.yountaewoo.weightLog.dto.WeightLogResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,12 @@ public class WeightLogService {
     private final WeightLogRepository weightLogRepository;
     private final UserRepository userRepository;
 
-    private WeightLogResponse transferToWeightLogResponse(WeightLog weightLog, User user, WeightLogRequest weightLogRequest) {
-        return new WeightLogResponse(user.getId(), weightLogRequest.weight(), weightLog.getRecordDate());
+    private WeightLogResponse toResponse(WeightLog weightLog) {
+        return new WeightLogResponse(
+                weightLog.getUserId(),
+                weightLog.getWeight(),
+                weightLog.getRecordDate()
+        );
     }
 
     @Transactional
@@ -29,6 +34,16 @@ public class WeightLogService {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NoSuchElementException("해당하는 사용자가 없습니다."));
         WeightLog weightLog = weightLogRepository.save(new WeightLog(user.getId(), weightLogRequest.weight(), LocalDate.now()));
-        return transferToWeightLogResponse(weightLog, user, weightLogRequest);
+        return toResponse(weightLog);
+    }
+
+    @Transactional
+    public WeightLogResponse update(String id, UpdateWeightRequest updateWeightRequest) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new NoSuchElementException("해당하는 사용자가 없습니다."));
+        WeightLog weight = weightLogRepository.findByUserIdAndRecordDate(user.getId(), updateWeightRequest.recordDate()).orElseThrow(
+                () -> new NoSuchElementException("해당하는 날짜의 기록이 없습니다."));
+        weight.updateWeight(updateWeightRequest.weight());
+        return toResponse(weight);
     }
 }

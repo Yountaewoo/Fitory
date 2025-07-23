@@ -1,13 +1,12 @@
 package io.github.yountaewoo.weightLog;
 
 import io.github.yountaewoo.loginUtils.LoginMemberId;
+import io.github.yountaewoo.weightLog.dto.UpdateWeightRequest;
 import io.github.yountaewoo.weightLog.dto.WeightLogRequest;
 import io.github.yountaewoo.weightLog.dto.WeightLogResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -19,5 +18,10 @@ public class WeightLogRestController {
     @PostMapping
     public WeightLogResponse create(@LoginMemberId String id, @RequestBody WeightLogRequest weightLogRequest) {
         return weightLogService.create(id, weightLogRequest);
+    }
+
+    @PatchMapping
+    public WeightLogResponse update(@LoginMemberId String id, @RequestBody UpdateWeightRequest updateWeightRequest) {
+        return weightLogService.update(id, updateWeightRequest);
     }
 }
