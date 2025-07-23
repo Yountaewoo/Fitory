@@ -5,11 +5,13 @@ import io.github.yountaewoo.user.UserRepository;
 import io.github.yountaewoo.weightLog.WeightLog;
 import io.github.yountaewoo.weightLog.WeightLogRepository;
 import io.github.yountaewoo.weightLog.WeightLogService;
+import io.github.yountaewoo.weightLog.dto.UpdateWeightRequest;
 import io.github.yountaewoo.weightLog.dto.WeightLogRequest;
 import io.github.yountaewoo.weightLog.dto.WeightLogResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -75,5 +77,78 @@ class WeightLogServiceTest {
 
         verify(userRepository).findById(userId);
         verifyNoMoreInteractions(weightLogRepository);
+    }
+
+    @Test
+    void update_success() {
+        // given
+        String userId = "user123";
+        LocalDate recordDate = LocalDate.of(2025, 7, 23);
+        double originalWeight = 70.0;
+        double newWeight = 68.5;
+
+        User user = new User(userId, "Taewoo", 169.3, null);
+        WeightLog existingLog = new WeightLog(userId, originalWeight, recordDate);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(weightLogRepository.findByUserIdAndRecordDate(userId, recordDate))
+                .thenReturn(Optional.of(existingLog));
+
+        // when
+        WeightLogResponse response = weightLogService.update(
+                userId,
+                new UpdateWeightRequest(recordDate, newWeight)
+        );
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.userId()).isEqualTo(userId);
+        assertThat(response.recordDate()).isEqualTo(recordDate);
+        assertThat(response.weight()).isEqualTo(newWeight);
+
+        // verify that the entity was modified
+        assertThat(existingLog.getWeight()).isEqualTo(newWeight);
+
+        verify(userRepository).findById(userId);
+        verify(weightLogRepository).findByUserIdAndRecordDate(userId, recordDate);
+    }
+
+    @Test
+    void update_userNotFound_throws() {
+        // given
+        String userId = "unknown";
+        LocalDate anyDate = LocalDate.now();
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() ->
+                weightLogService.update(userId, new UpdateWeightRequest(anyDate, 60.0))
+        ).isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당하는 사용자가 없습니다.");
+
+        verify(userRepository).findById(userId);
+        verifyNoInteractions(weightLogRepository);
+    }
+
+    @Test
+    void update_logNotFound_throws() {
+        // given
+        String userId = "user123";
+        LocalDate recordDate = LocalDate.of(2025, 7, 23);
+
+        User user = new User(userId, "Taewoo", 169.3, null);
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(weightLogRepository.findByUserIdAndRecordDate(userId, recordDate))
+                .thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() ->
+                weightLogService.update(userId, new UpdateWeightRequest(recordDate, 65.0))
+        ).isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당하는 날짜의 기록이 없습니다.");
+
+        verify(userRepository).findById(userId);
+        verify(weightLogRepository).findByUserIdAndRecordDate(userId, recordDate);
     }
 }
