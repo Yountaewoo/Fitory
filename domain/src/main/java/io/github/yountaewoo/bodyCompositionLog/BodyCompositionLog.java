@@ -1,19 +1,18 @@
-package io.github.yountaewoo.weightLog;
+package io.github.yountaewoo.bodyCompositionLog;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Entity
-public class WeightLog {
+public class BodyCompositionLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +22,17 @@ public class WeightLog {
 
     private double weight;
 
+    private double bodyFatMass;
+
+    private double skeletalMuscleMass;
+
     private LocalDate recordDate;
 
-    public WeightLog(String userId, double weight, LocalDate recordDate) {
+    public BodyCompositionLog(String userId, double weight, double bodyFatMass, double skeletalMuscleMass, LocalDate recordDate) {
         this.userId = userId;
         this.weight = weight;
+        this.bodyFatMass = bodyFatMass;
+        this.skeletalMuscleMass = skeletalMuscleMass;
         this.recordDate = recordDate;
-    }
-
-    public void updateWeight(double weight) {
-        this.weight = weight;
     }
 }
