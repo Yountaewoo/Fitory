@@ -1,5 +1,6 @@
 package io.github.yountaewoo.user;
 
+import io.github.yountaewoo.user.dto.HeightRequest;
 import io.github.yountaewoo.user.dto.UserRequest;
 import io.github.yountaewoo.user.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +35,18 @@ public class UserService {
         return transToUserResponse(user);
     }
 
-    public void withdrawMember(String userid) {
-        User user = userRepository.findById(userid).orElseThrow(
+    public void withdrawMember(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new NoSuchElementException("해당하는 사용자가 없습니다.")
         );
         user.withdraw();
+    }
+
+    @Transactional
+    public void updateHeight(String userId, HeightRequest request) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NoSuchElementException("해당하는 사용자가 없습니다.")
+        );
+        user.updateHeight(request.height());
     }
 }

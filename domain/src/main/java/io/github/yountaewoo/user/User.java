@@ -1,6 +1,7 @@
 package io.github.yountaewoo.user;
 
 import io.github.yountaewoo.Gender;
+import io.github.yountaewoo.user.dto.HeightRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,5 +35,9 @@ public class User {
 
     public void withdraw() {
         this.withdrawn = true;
+    }
+
+    public void updateHeight(double height) {
+        this.height = height;
     }
 }
