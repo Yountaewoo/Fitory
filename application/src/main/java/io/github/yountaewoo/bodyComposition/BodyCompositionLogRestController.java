@@ -1,6 +1,6 @@
 package io.github.yountaewoo.bodyComposition;
 
-import io.github.yountaewoo.bodyCompoositionLog.BodyCompositionLogService;
+import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogService;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogRequest;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogResponse;
 import io.github.yountaewoo.loginUtils.LoginMemberId;
@@ -21,5 +21,10 @@ public class BodyCompositionLogRestController {
     @PostMapping
     public BodyCompositionLogResponse findOrCreateTodayLog(@LoginMemberId String userId, @RequestBody BodyCompositionLogRequest request) {
         return bodyCompositionLogService.findOrCreateTodayLog(userId, request);
+    }
+
+    @PatchMapping
+    public BodyCompositionLogResponse update(@LoginMemberId String userId, @RequestBody BodyCompositionLogRequest request) {
+        return bodyCompositionLogService.update(userId, request);
     }
 }

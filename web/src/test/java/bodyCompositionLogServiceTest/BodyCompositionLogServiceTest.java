@@ -1,6 +1,6 @@
 package bodyCompositionLogServiceTest;
 
-import io.github.yountaewoo.bodyCompoositionLog.BodyCompositionLogService;
+import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogService;
 import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLog;
 import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogRepository;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogRequest;

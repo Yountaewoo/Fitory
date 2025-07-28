@@ -1,7 +1,5 @@
-package io.github.yountaewoo.bodyCompoositionLog;
+package io.github.yountaewoo.bodyCompositionLog;
 
-import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLog;
-import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogRepository;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogRequest;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogResponse;
 import io.github.yountaewoo.user.User;
@@ -27,6 +25,24 @@ public class BodyCompositionLogService {
                 bodyCompositionLog.getBodyFatMass(), bodyCompositionLog.getSkeletalMuscleMass(), bodyCompositionLog.getRecordDate());
     }
 
+    private void updateBodyFatMassIfNotNull(BodyCompositionLogRequest request, BodyCompositionLog bodyCompositionLog) {
+        if (request.bodyFatMass() != null) {
+            bodyCompositionLog.setBodyFatMass(request.bodyFatMass());
+        }
+    }
+
+    private void updateWeightIfNotNull(BodyCompositionLogRequest request, BodyCompositionLog bodyCompositionLog) {
+        if (request.weight() != null) {
+            bodyCompositionLog.setWeight(request.weight());
+        }
+    }
+
+    private void updateSkeletalMuscleMassIfNotNull(BodyCompositionLogRequest request, BodyCompositionLog bodyCompositionLog) {
+        if (request.skeletalMuscleMass() != null) {
+            bodyCompositionLog.setSkeletalMuscleMass(request.skeletalMuscleMass());
+        }
+    }
+
     @Transactional
     public BodyCompositionLogResponse findOrCreateTodayLog(String userId, BodyCompositionLogRequest request) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -35,6 +51,18 @@ public class BodyCompositionLogService {
                 () -> bodyCompositionLogRepository.save(new BodyCompositionLog(user.getId(), request.weight(),
                         request.bodyFatMass(), request.skeletalMuscleMass(), LocalDate.now()))
         );
+        return transferToBodyCompositionLogResponse(user, bodyCompositionLog);
+    }
+
+    @Transactional
+    public BodyCompositionLogResponse update(String userId, BodyCompositionLogRequest request) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new NoSuchElementException("해당하는 사용자가 없습니다."));
+        BodyCompositionLog bodyCompositionLog = bodyCompositionLogRepository.findByUserIdAndRecordDate(user.getId(), LocalDate.now()).orElseThrow(
+                () -> new NoSuchElementException("해당하는 기록이 없습니다."));
+        updateBodyFatMassIfNotNull(request, bodyCompositionLog);
+        updateSkeletalMuscleMassIfNotNull(request, bodyCompositionLog);
+        updateWeightIfNotNull(request, bodyCompositionLog);
         return transferToBodyCompositionLogResponse(user, bodyCompositionLog);
     }
 }
