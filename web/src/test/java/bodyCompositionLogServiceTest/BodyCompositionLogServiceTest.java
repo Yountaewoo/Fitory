@@ -1,8 +1,8 @@
 package bodyCompositionLogServiceTest;
 
-import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogService;
 import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLog;
 import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogRepository;
+import io.github.yountaewoo.bodyCompositionLog.BodyCompositionLogService;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogRequest;
 import io.github.yountaewoo.bodyCompositionLog.dto.BodyCompositionLogResponse;
 import io.github.yountaewoo.user.User;
@@ -48,6 +48,8 @@ class BodyCompositionLogServiceTest {
         dummyUser = new User(USER_ID, "테스트", 180.0, null);
     }
 
+    // findOrCreateTodayLog Tests
+
     @Test
     void findOrCreateTodayLog_userNotFound_throwsException() {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
@@ -67,7 +69,6 @@ class BodyCompositionLogServiceTest {
     void findOrCreateTodayLog_logExists_returnsExisting() {
         BodyCompositionLog existingLog = new BodyCompositionLog(
                 USER_ID, 65.5, 12.3, 28.1, TODAY);
-        // private id 필드에 리플렉션으로 값 세팅
         ReflectionTestUtils.setField(existingLog, "id", 42L);
 
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(dummyUser));
@@ -95,7 +96,6 @@ class BodyCompositionLogServiceTest {
         when(bodyCompositionLogRepository.findByUserIdAndRecordDate(USER_ID, TODAY))
                 .thenReturn(Optional.empty());
 
-        // 저장 리턴용 객체에 역시 리플렉션으로 id 부여
         BodyCompositionLog savedLog = new BodyCompositionLog(
                 USER_ID, 70.0, 15.0, 30.0, TODAY);
         ReflectionTestUtils.setField(savedLog, "id", 99L);
@@ -121,5 +121,74 @@ class BodyCompositionLogServiceTest {
         assertThat(resp.skeletalMuscleMass()).isEqualTo(30.0);
         assertThat(resp.recordDate()).isEqualTo(TODAY);
     }
-}
 
+    // update Tests
+
+    @Test
+    void update_userNotFound_throwsException() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
+
+        BodyCompositionLogRequest req = new BodyCompositionLogRequest(60.0, 20.0, 30.0);
+        assertThatThrownBy(() -> bodyCompositionLogService.update(USER_ID, req))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당하는 사용자가 없습니다.");
+
+        verify(userRepository).findById(USER_ID);
+        verifyNoMoreInteractions(bodyCompositionLogRepository);
+    }
+
+    @Test
+    void update_logNotFound_throwsException() {
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(dummyUser));
+        when(bodyCompositionLogRepository.findByUserIdAndRecordDate(USER_ID, TODAY))
+                .thenReturn(Optional.empty());
+
+        BodyCompositionLogRequest req = new BodyCompositionLogRequest(60.0, 20.0, 30.0);
+        assertThatThrownBy(() -> bodyCompositionLogService.update(USER_ID, req))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당하는 기록이 없습니다.");
+
+        verify(userRepository).findById(USER_ID);
+        verify(bodyCompositionLogRepository).findByUserIdAndRecordDate(USER_ID, TODAY);
+    }
+
+    @Test
+    void update_partialFields_updatesOnlyNonNull() {
+        BodyCompositionLog existingLog = new BodyCompositionLog(USER_ID, 65.0, 12.0, 28.0, TODAY);
+        ReflectionTestUtils.setField(existingLog, "id", 5L);
+
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(dummyUser));
+        when(bodyCompositionLogRepository.findByUserIdAndRecordDate(USER_ID, TODAY))
+                .thenReturn(Optional.of(existingLog));
+
+        BodyCompositionLogRequest req = new BodyCompositionLogRequest(70.5, null, 32.1);
+        BodyCompositionLogResponse resp = bodyCompositionLogService.update(USER_ID, req);
+
+        assertThat(resp.id()).isEqualTo(5L);
+        assertThat(resp.userId()).isEqualTo(USER_ID);
+        assertThat(resp.weight()).isEqualTo(70.5);
+        assertThat(resp.bodyFatMass()).isEqualTo(12.0);
+        assertThat(resp.skeletalMuscleMass()).isEqualTo(32.1);
+        assertThat(resp.recordDate()).isEqualTo(TODAY);
+    }
+
+    @Test
+    void update_allFields_updatedCorrectly() {
+        BodyCompositionLog existingLog = new BodyCompositionLog(USER_ID, 65.0, 12.0, 28.0, TODAY);
+        ReflectionTestUtils.setField(existingLog, "id", 8L);
+
+        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(dummyUser));
+        when(bodyCompositionLogRepository.findByUserIdAndRecordDate(USER_ID, TODAY))
+                .thenReturn(Optional.of(existingLog));
+
+        BodyCompositionLogRequest req = new BodyCompositionLogRequest(75.0, 18.5, 34.2);
+        BodyCompositionLogResponse resp = bodyCompositionLogService.update(USER_ID, req);
+
+        assertThat(resp.id()).isEqualTo(8L);
+        assertThat(resp.userId()).isEqualTo(USER_ID);
+        assertThat(resp.weight()).isEqualTo(75.0);
+        assertThat(resp.bodyFatMass()).isEqualTo(18.5);
+        assertThat(resp.skeletalMuscleMass()).isEqualTo(34.2);
+        assertThat(resp.recordDate()).isEqualTo(TODAY);
+    }
+}
