@@ -4,6 +4,7 @@ import io.github.yountaewoo.Gender;
 import io.github.yountaewoo.user.User;
 import io.github.yountaewoo.user.UserRepository;
 import io.github.yountaewoo.user.UserService;
+import io.github.yountaewoo.user.dto.HeightRequest;
 import io.github.yountaewoo.user.dto.UserRequest;
 import io.github.yountaewoo.user.dto.UserResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -100,5 +101,39 @@ class UserServiceTest {
         then(userRepository).should().findById(userId);
     }
 
-}
+    // --- updateHeight 메서드 테스트 추가 ↓ ---
 
+    @Test
+    @DisplayName("존재하는 사용자의 키를 업데이트하면 height 필드가 변경된다")
+    void givenExistingUser_whenUpdateHeight_thenHeightIsUpdated() {
+        // given
+        String userId = "user4";
+        User existing = new User(userId, "최민수", 170.0, Gender.Man);
+        given(userRepository.findById(userId)).willReturn(Optional.of(existing));
+
+        HeightRequest req = new HeightRequest(182.5);
+
+        // when
+        userService.updateHeight(userId, req);
+
+        // then
+        assertThat(existing.getHeight()).isEqualTo(req.height());
+        then(userRepository).should().findById(userId);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자의 키 업데이트 시 NoSuchElementException 발생")
+    void givenNoUser_whenUpdateHeight_thenThrowException() {
+        // given
+        String userId = "unknown";
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        HeightRequest req = new HeightRequest(180.0);
+
+        // when & then
+        assertThatThrownBy(() -> userService.updateHeight(userId, req))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당하는 사용자가 없습니다.");
+        then(userRepository).should().findById(userId);
+    }
+}
