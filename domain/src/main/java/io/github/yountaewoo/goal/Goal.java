@@ -1,9 +1,6 @@
 package io.github.yountaewoo.goal;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,11 +26,17 @@ public class Goal {
 
     private LocalDate endDate;
 
-    public Goal(String userId, double targetBodyFatPercent, double targetMuscleMes, LocalDate startDate, LocalDate endDate) {
+    @PrePersist
+    void onCreate() {
+        if (this.startDate == null) {
+            this.startDate = LocalDate.now();
+        }
+    }
+
+    public Goal(String userId, double targetBodyFatPercent, double targetMuscleMes, LocalDate endDate) {
         this.userId = userId;
         this.targetBodyFatPercent = targetBodyFatPercent;
         this.targetMuscleMes = targetMuscleMes;
-        this.startDate = startDate;
         this.endDate = endDate;
     }
 }
