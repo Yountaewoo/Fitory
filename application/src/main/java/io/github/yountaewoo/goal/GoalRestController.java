@@ -28,4 +28,9 @@ public class GoalRestController {
     public GoalResponse updateGoal(@LoginMemberId String userId, @RequestBody GoalRequest goalRequest) {
         return goalService.updateGoal(userId, goalRequest);
     }
+
+    @PostMapping
+    public void completedGoal(@LoginMemberId String userId) {
+        goalService.completedGoal(userId);
+    }
 }

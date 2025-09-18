@@ -62,4 +62,17 @@ public class GoalService {
         goal.updateGoal(goalRequest);
         return transferToGoalResponse(goal);
     }
+
+    @Transactional
+    public void completedGoal(String userId) {
+        Goal goal = goalRepository.findByUserId(userId).orElseThrow(
+                () -> new NoSuchElementException("해당하는 목표가 없습니다."));
+        GoalHistory goalHistory = goalHistoryRepository.save(new GoalHistory(goal.getUserId(),
+                goal.getTargetBodyFatPercent(),
+                goal.getTargetMuscleMes(),
+                goal.getStartDate(),
+                goal.getEndDate(),
+                GoalStatus.COMPLETED));
+        goalRepository.delete(goal);
+    }
 }
