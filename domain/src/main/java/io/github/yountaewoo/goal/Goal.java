@@ -1,5 +1,6 @@
 package io.github.yountaewoo.goal;
 
+import io.github.yountaewoo.goal.dto.GoalRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,5 +39,11 @@ public class Goal {
         this.targetBodyFatPercent = targetBodyFatPercent;
         this.targetMuscleMes = targetMuscleMes;
         this.endDate = endDate;
+    }
+
+    public void updateGoal(GoalRequest goalRequest) {
+        this.targetBodyFatPercent = goalRequest.targetBodyFatPercent();
+        this.targetMuscleMes = goalRequest.targetMuscleMes();
+        this.endDate = goalRequest.endDate();
     }
 }

@@ -54,4 +54,12 @@ public class GoalService {
                 GoalStatus.CANCELLED));
         goalRepository.delete(goal);
     }
+
+    @Transactional
+    public GoalResponse updateGoal(String userId, GoalRequest goalRequest) {
+        Goal goal = goalRepository.findByUserId(userId).orElseThrow(
+                () -> new NoSuchElementException("해당하는 목표가 없습니다."));
+        goal.updateGoal(goalRequest);
+        return transferToGoalResponse(goal);
+    }
 }

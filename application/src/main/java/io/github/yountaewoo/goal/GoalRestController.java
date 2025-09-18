@@ -23,4 +23,9 @@ public class GoalRestController {
     public void cancelGoal(@LoginMemberId String userId) {
         goalService.cancelGoal(userId);
     }
+
+    @PutMapping
+    public GoalResponse updateGoal(@LoginMemberId String userId, @RequestBody GoalRequest goalRequest) {
+        return goalService.updateGoal(userId, goalRequest);
+    }
 }
