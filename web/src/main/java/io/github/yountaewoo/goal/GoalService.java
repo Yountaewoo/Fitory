@@ -7,10 +7,12 @@ import io.github.yountaewoo.goalHistory.GoalHistory;
 import io.github.yountaewoo.goalHistory.GoalHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -74,5 +76,26 @@ public class GoalService {
                 goal.getEndDate(),
                 GoalStatus.COMPLETED));
         goalRepository.delete(goal);
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    @Transactional
+    public void archiveExpiredGoals() {
+        LocalDate today = LocalDate.now();
+        List<Goal> goals = goalRepository.findByEndDateBefore(today);
+        if (goals.isEmpty()) {
+            log.info("[GoalScheduler] {} 만료된 목표 없음", today);
+            return;
+        }
+        for (Goal goal : goals) {
+            GoalHistory goalHistory = goalHistoryRepository.save(new GoalHistory(goal.getUserId(),
+                    goal.getTargetBodyFatPercent(),
+                    goal.getTargetMuscleMes(),
+                    goal.getStartDate(),
+                    goal.getEndDate(),
+                    GoalStatus.EXPIRED));
+            goalRepository.delete(goal);
+        }
+        log.info("[GoalScheduler] {} 만료된 목표 {}건 아카이브 완료", today, goals.size());
     }
 }
