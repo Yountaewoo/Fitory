@@ -1,10 +1,7 @@
 package io.github.yountaewoo.goalHistory;
 
 import io.github.yountaewoo.GoalStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,16 +24,26 @@ public class GoalHistory {
 
     private LocalDate startDate;
 
-    private LocalDate endDate;
+    private LocalDate archivedAt;
 
+    private LocalDate plannedEndDate;
+
+    @Enumerated(EnumType.STRING)
     private GoalStatus goalStatus;
 
-    public GoalHistory(String userId, double targetBodyFatPercent, double targetMuscleMes, LocalDate startDate, LocalDate endDate, GoalStatus goalStatus) {
+    @PrePersist
+    void onCreate() {
+        if (this.archivedAt == null) {
+            this.archivedAt = LocalDate.now();
+        }
+    }
+
+    public GoalHistory(String userId, double targetBodyFatPercent, double targetMuscleMes, LocalDate startDate, LocalDate plannedEndDate, GoalStatus goalStatus) {
         this.userId = userId;
         this.targetBodyFatPercent = targetBodyFatPercent;
         this.targetMuscleMes = targetMuscleMes;
         this.startDate = startDate;
-        this.endDate = endDate;
+        this.plannedEndDate = plannedEndDate;
         this.goalStatus = goalStatus;
     }
 }
